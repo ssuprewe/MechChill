@@ -1,37 +1,73 @@
-# ⌨️ MechChill
+# MechChill
 
-<div align="center">
+> Ultra-lightweight, zero-idle-CPU mechanical keyboard sound engine for Windows.
 
-**Ultra-Lightweight Mechanical Keyboard Sound Engine for Windows**
+[![Go Version](https://img.shields.io/badge/go-1.21%2B-blue.svg)](https://golang.org)
+[![Platform](https://img.shields.io/badge/platform-Windows-0078D6.svg)](#requirements)
+[![Architecture](https://img.shields.io/badge/arch-x64-lightgrey.svg)](#building-from-source)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
-[![Go Version](https://img.shields.io/badge/Go-1.21+-00ADD8?style=flat-square&logo=go)](https://go.dev/)
-[![Platform](https://img.shields.io/badge/Platform-Windows%2010%20%2F%2011-0078D6?style=flat-square&logo=windows)](https://microsoft.com)
-[![RAM Usage](https://img.shields.io/badge/RAM-%3C%205%20MB-success?style=flat-square)]()
-[![Idle CPU](https://img.shields.io/badge/Idle%20CPU-0.0%25-brightgreen?style=flat-square)]()
-[![License](https://img.shields.io/badge/License-MIT-blue?style=flat-square)](LICENSE)
-
-*Satisfying mechanical keyboard clicks with pure native performance. No Electron. No heavy frameworks. Just chill.*
-
-</div>
+MechChill brings the tactile, satisfying sound of high-end mechanical keyboards to every keystroke across your Windows system. Built purely in Go with native Win32 API calls (`winmm.dll`, `user32.dll`), MechChill eliminates the high CPU usage, memory bloat, and audio latency common in Electron-based sound utilities.
 
 ---
 
-## 🌟 Why MechChill?
+## Highlights
 
-Most mechanical keyboard sound simulators (like Mechvibes and similar tools) run on **Electron or Chromium**, easily eating **150–400 MB of RAM** and running active polling loops in the background.
-
-**MechChill** was built to solve this problem:
-- **< 5 MB RAM** total footprint in memory.
-- **0.0% Idle CPU**: Pure Windows event-driven architecture using native low-level keyboard hooks (`WH_KEYBOARD_LL`) and message pumps.
-- **Ultra-low Latency**: Direct Win32 `waveOut` 16-voice polyphonic pool — no sound lag, no cutting off keystroke reverberations even at 150+ WPM.
-- **Administrator / UIPI Support**: Works seamlessly across all windows, Task Manager, elevated terminals, and games.
-- **Single-Instance Mutex**: Prevents accidental duplicate instances and audio echo.
-- **Native ANSI Console UI**: Clean, colorized terminal with in-place screen clearing (`clear / cls`), live volume gauge, and quick status badges.
-- **System Tray Integration**: Press `[Q]` or `[Ctrl+C]` to minimize to the background tray; runs quietly without cluttering your taskbar.
+- **Near-Zero Latency Audio**: 16-voice polyphonic audio pool using the native Win32 `waveOut` API, delivering instant click responses and dynamic voice stealing even during rapid typing.
+- **Minimal Footprint**: Consumes less than 5 MB of RAM and 0.0% CPU when idle through event-driven Windows message hooks (`WH_KEYBOARD_LL`).
+- **Tactile Key Down & Release**: Independent sounds for key downstrokes and upstrokes (bas-çek) to replicate mechanical switch physics.
+- **Repeat Suppression**: Configurable filtering prevents machine-gun sound loops when holding keys down.
+- **Modular Sound Packs**: Includes pre-loaded switches and supports drag-and-drop custom packs, including Mechvibes sound pack formats.
+- **System Tray Integration**: Quietly runs in the background. Minimize to tray with a keystroke and restore at any time.
+- **UIPI Elevation**: Built-in one-key elevation (`[A]`) to ensure keystrokes register across administrative windows, games, and Task Manager.
+- **Zero External Audio Dependencies**: No CGO, DirectX, SDL, or external audio libraries required.
 
 ---
 
-## 📸 Terminal Interface
+## Requirements
+
+- **Operating System**: Windows 10 / Windows 11 (64-bit recommended)
+- **Runtime**: None required for the standalone executable (`MechChill.exe`)
+- **Compilation (Optional)**: Go 1.21 or newer
+
+---
+
+## Quick Start
+
+1. Download or clone this repository:
+   ```powershell
+   git clone https://github.com/your-username/MechChill.git
+   cd MechChill
+   ```
+2. Run `MechChill.exe`.
+3. Type anywhere on your keyboard to hear the switch sounds immediately.
+
+> [!TIP]
+> Press `[Q]` at any time to hide the console window to the System Tray. Double-click the tray icon or right-click and select **Show Console** to restore it.
+
+---
+
+## Building from Source
+
+To compile the binary yourself using standard Go tooling:
+
+### Using the Build Script
+```cmd
+build.bat
+```
+
+### Manual Compilation
+```powershell
+go build -ldflags "-s -w" -o MechChill.exe .
+```
+
+The resulting executable is fully portable and self-contained. Ensure that the `packs/` and/or `sounds/` directory resides in the same folder as `MechChill.exe`.
+
+---
+
+## Controls and CLI Dashboard
+
+MechChill provides an interactive terminal interface alongside system tray controls:
 
 ```text
  ╔═══════════════════════════════════════════════════════╗
@@ -41,110 +77,87 @@ Most mechanical keyboard sound simulators (like Mechvibes and similar tools) run
 
    Status     : ● ACTIVE
    Privileges : ● ELEVATED (Active in ALL windows & Task Manager)
-   Volume     : [██████░░░░] 60%
+   Volume     : [█████░░░░░] 50%
    Sound Pack : CherryMX-Blue
-
- ───────────────────────────────────────────────────────
-   [1] Settings            (Volume, Packs, Repeat, Bas-Çek)
-   [2] Sound Test         (Play sample clicks)
-   [3] Reload Sounds      (Reload WAVs from disk)
-   [4] Dev Tools          (Debug key events & RAM)
-   [5] About              (App info & philosophy)
-
-   [Q] Hide to System Tray  (Runs quietly in background)
- ───────────────────────────────────────────────────────
-   Listening for keyboard input...
-   ❯ 
 ```
 
----
+### Menu Options
 
-## ✨ Features
-
-- 🎧 **16-Voice Polyphonic WaveOut Engine**: Preloaded in-memory buffers ensure instantaneous response with zero disk I/O while typing.
-- 🛡️ **UIPI Elevation Support**: Windows User Interface Privilege Isolation blocks standard apps from hooking administrator windows. MechChill includes built-in elevation detection and one-click `[A]` relaunch as Administrator.
-- 🔒 **Single Instance Protection**: A Win32 system mutex ensures only one instance runs at a time. Launching a second instance restores the active console.
-- 🔄 **Release Sounds (Bas-Çek)**: Natural up-stroke release sound playback for ultra-realistic mechanical switch simulation.
-- 🎲 **Acoustic Variation**: Randomly alternates subtle audio variations for alphanumeric keys so typing sounds organic.
-- 📦 **6 Pre-bundled Sound Packs**:
-  - **Cherry MX Blue**: Loud, crisp, and clicky.
-  - **ZealPC Tealios V2**: Ultra-smooth, thocky linear switch.
-  - **NovelKeys Cream**: Deep POM mechanical linear profile.
-  - **Vintage Typewriter**: Authentic vintage typewriter strikes and return bell.
-  - **Cherry G80-3494**: Silent Red smooth linear switch.
-  - **Bubble Pop**: Playful, bubbly popping sound feedback.
-- 🧩 **Mechvibes Compatibility**: Automatically parses Mechvibes sliced sound atlas packs (`sound.wav` + `config.json` V1/V2).
-- 📌 **System Tray & Background Support**:
-  - Closing, pressing `[Q]`, or `[Ctrl+C]` hides the console window into the Windows System Tray.
-  - Right-click tray icon to quick-toggle mute or open settings.
-  - Double-click tray icon to restore the console.
-- 🚀 **Windows Startup Support**: Easily toggle running MechChill on Windows boot directly from the settings menu.
+| Key | Action | Description |
+|:---:|:---|:---|
+| `1` | **Settings** | Adjust volume (0–100), toggle sound, release sounds, key repeat, and startup |
+| `2` | **Sound Test** | Play a sample click sequence to test current audio output |
+| `3` | **Reload Sounds** | Hot-reload all sound files from disk without restarting the application |
+| `4` | **Dev Tools** | Live keyboard event logger, memory stats, voice allocation inspection |
+| `5` | **About** | Application architecture details and shortcuts |
+| `A` | **Relaunch as Admin** | Elevates the process to bypass Windows UIPI restrictions |
+| `Q` | **Hide to Tray** | Minimizes the terminal window to the notification area |
 
 ---
 
-## ⌨️ Controls & Shortcuts
+## Sound Packs
 
-| Action | How to Trigger |
-| :--- | :--- |
-| **Hide to Tray** | Press `[Q]`, `[Ctrl+C]` in console, or click close button `[X]` |
-| **Relaunch as Admin** | Press `[A]` in console main menu or select `[9]` in Settings |
-| **Restore Console** | Double-click the tray icon or right-click → `Open Console` |
-| **Quick Mute / Unmute** | Right-click tray icon → `Enable / Disable Sounds` |
-| **Change Volume** | Open Settings (`[1]`) → Select `[1] Volume` |
-| **Switch Sound Pack** | Open Settings (`[1]`) → Select `[4] Sound Pack` |
-| **Full Exit** | Right-click tray icon → `Exit` |
+MechChill includes several switch profiles in the `packs/` folder:
 
----
+- **Cherry MX Blue**: Crisp, clicky tactile switches
+- **NovelKeys Cream**: Smooth POM linear acoustics
+- **ZealPC Tealios V2**: Deep, thocky high-end linear switches
+- **Cherry G80-3494**: Soft, smooth silent red linear profile
+- **Bubble**: Playful bubble popping effects
+- **Vintage Typewriter**: Classic typewriter mechanics with carriage return
 
-## 📦 Adding Custom Sound Packs
+### Adding Custom Packs
 
-MechChill makes adding new switch sounds effortless. You can drop any pack inside the `packs/` directory:
+Create a new subfolder in `packs/<YourPackName>/` with individual `.wav` files:
 
-### Option A: Discrete WAV Files
-Create a folder inside `packs/` (e.g. `packs/Holy-Panda/`):
 ```text
-packs/Holy-Panda/
-├── key1.wav (or a.wav, b.wav, etc.)
-├── key2.wav
-├── space.wav
-├── enter.wav
-├── backspace.wav
-├── shift.wav
-└── release.wav (optional key release sound)
+packs/MySwitch/
+├── key1.wav ... key6.wav   # Standard keystrokes (randomized)
+├── space.wav               # Spacebar
+├── enter.wav               # Enter key
+├── backspace.wav           # Backspace key
+├── shift.wav               # Shift keys
+└── release.wav             # Key release / upstroke (optional)
 ```
 
-### Option B: Mechvibes Soundpacks
-MechChill natively loads Mechvibes packs without conversion! Simply place the pack folder containing:
-```text
-packs/MyPack/
-├── sound.wav
-└── config.json
-```
-MechChill will parse the timing definitions automatically on startup.
+MechChill also reads Mechvibes-style sound packs containing a `config.json` sound map definition.
 
 ---
 
-## 🛠️ Building from Source
+## Configuration
 
-### Prerequisites
-- **Windows 10 / 11** (x64)
-- **Go 1.21+** installed ([golang.org](https://go.dev/))
+Settings are saved in `config.json` next to the executable and persist between sessions:
 
-### Compile:
-Run the included build script:
-```cmd
-build.bat
+```json
+{
+  "volume": 50,
+  "enabled": true,
+  "random_sounds": true,
+  "sound_pack": "CherryMX-Blue",
+  "startup_enabled": false,
+  "allow_repeat": false,
+  "release_sound": true
+}
 ```
-Or build manually with optimized flags:
-```powershell
-go build -ldflags "-s -w" -o MechChill.exe .
-```
 
-The resulting `MechChill.exe` is a single, portable executable with zero runtime dependencies.
+| Field | Type | Default | Description |
+|:---|:---:|:---:|:---|
+| `volume` | `int` | `50` | Output volume level (0 to 100). |
+| `enabled` | `bool` | `true` | Master audio enable/mute toggle. |
+| `random_sounds` | `bool` | `true` | Randomizes sound variation across standard alphanumeric keys. |
+| `sound_pack` | `string` | `"CherryMX-Blue"` | Active pack folder name inside `packs/`. |
+| `startup_enabled` | `bool` | `false` | Registers MechChill in Windows Registry (`Run` key) for auto-start. |
+| `allow_repeat` | `bool` | `false` | When `true`, holding down a key continuously retriggers sounds. |
+| `release_sound` | `bool` | `true` | Plays an upstroke sound when a key is released. |
 
 ---
 
-## 📄 License
+## Privilege Levels & Windows UIPI
 
-This project is licensed under the [MIT License](LICENSE).
-Feel free to use, modify, and distribute it!
+> [!IMPORTANT]
+> Under Windows User Interface Privilege Isolation (UIPI), standard user processes cannot receive low-level keyboard hooks while an elevated window (such as Task Manager, administrative command prompts, or games run as admin) has focus.
+> 
+> Press `[A]` in the menu or run MechChill as Administrator to ensure consistent acoustics across all open software.
+
+> [!NOTE]
+> Keystrokes are captured strictly in memory to calculate sound playback triggers and are never logged, cached, or transmitted over any network interface.
