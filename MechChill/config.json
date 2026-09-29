@@ -1,0 +1,9 @@
+{
+  "volume": 50,
+  "enabled": true,
+  "random_sounds": true,
+  "sound_pack": "CherryMX-Blue",
+  "startup_enabled": false,
+  "allow_repeat": false,
+  "release_sound": true
+}
